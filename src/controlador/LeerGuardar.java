@@ -17,6 +17,7 @@ public class LeerGuardar {
     BufferedReader br;
     String texto="";        
     //Perra
+    //Andres gay
     public String leerTxt() throws IOException{                             
         fc = new JFileChooser();     
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);                                           //Buscar solo archivos de texto
