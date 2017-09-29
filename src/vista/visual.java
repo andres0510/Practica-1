@@ -5,16 +5,18 @@ import controlador.LeerGuardar;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 public final class visual extends javax.swing.JFrame {
     
-    LeerGuardar b = new LeerGuardar();
-    ControladorInterfaz a = new ControladorInterfaz();
+    LeerGuardar inOut = new LeerGuardar();
+    ControladorInterfaz control = new ControladorInterfaz();
+    boolean gramValid;
     
     public visual() {
         initComponents();
-        a.iniciarBotones(validar, guardarA, autDeterm, simplificar);
-        a.iniciarText(jTextField1, jTextArea2, jTextArea3);
+        control.iniciarBotones(validar, guardarA, autDeterm, simplificar);
+        control.iniciarText(jTextField1, jTextArea2, jTextArea3);
     }
         
     /**
@@ -203,8 +205,13 @@ public final class visual extends javax.swing.JFrame {
 
     private void insertarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertarActionPerformed
         try {
-            String gramatica = b.leerTxt();
-            jTextArea1.setText(gramatica);
+            String gramatica = inOut.leerTxt();
+            gramValid = inOut.validarGram(gramatica);
+            if(gramValid){
+                jTextArea1.setText(gramatica);
+            } else{
+                JOptionPane.showMessageDialog(null, "La gramática ingresada no es válida");
+            }
         } catch (IOException ex) {
             Logger.getLogger(visual.class.getName()).log(Level.SEVERE, null, ex);
         }
