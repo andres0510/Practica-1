@@ -30,7 +30,8 @@ public class LeerGuardar {
                 br = new BufferedReader(new InputStreamReader(entrada,"iso-8859-1"));                       //Admitir caracteres especiales
                 String aux;
                 while((aux=br.readLine())!= null){
-                    texto = texto + aux + "\n";
+                    if(!aux.equals(""))
+                        texto = texto + aux +'\n';
                 }
                 entrada.close();
                 texto = texto.replaceAll(" ", "");                                                          //Eliminar espacios en la gramatica

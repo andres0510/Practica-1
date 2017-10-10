@@ -25,12 +25,12 @@ public class ListaP {
     }
 
     public void insertarNodo(String dato, char tipo, boolean finDeLinea, NodoLg padre){     //Hace las validaciones para insertar T y NT a la lista
-        if(padre==null){                                                                    //Si el nodo no tiene padre entonces pertenece a la izquierda de la gramática
+        if(padre!=null){                                                                    //Si el nodo no tiene padre entonces pertenece a la izquierda de la gramática
             if(encontrarDato(dato)){                                                        //Si encuentra que el NT ya existe, entonces actualiza posicion para agregar ahí
                 posicion=posicion.getLigaH();
             }
             else{                                                                           //Si no existe el NT, entonces lo agrega y le añade un nodo cabeza para empezar a agregar ahí
-                conectarNodo(dato, 'n', finDeLinea);
+                conectarNodo(dato, tipo, finDeLinea);
                 agregarNodoCabeza();
             }
         } else{                                                                             //El dato que se va a insertar a la lista hace parte de la derecha de la gramática
