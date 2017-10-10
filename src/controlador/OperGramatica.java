@@ -19,12 +19,14 @@ public class OperGramatica {
         ListaP lista=new ListaP();
         NodoLg padre=new NodoLg("*");
         String aux,aux2;
-        while(i<(n-1)){                                            //Recorre hasta la longitud total -1 para no tener en cuenta el ultimo salto de linea
+        while(i<n){                                            //Recorre hasta la longitud total -1 para no tener en cuenta el ultimo salto de linea
             aux=Character.toString(grama.charAt(i+1));             //Este while controla el lado izquierdo de la gramatica
-            j=i+4;                                                 // Contador que me llevara al lado derecho ce la gramatica
+           
+            j=i+4;                                                // Contador que me llevara al lado derecho ce la gramatica
             aux2=Character.toString(grama.charAt(j));
             lista.insertarNodo(aux, 'n', false, padre);            //Inserta el lado izquierdo de la gramatica
-            while(!aux2.equals('\n')){
+            while(!"\n".equals(aux2)){
+                
                 switch(aux2){                                      //Este while controla el lado derecho de la gramatica
                     case "<": j++;
                               aux2=Character.toString(grama.charAt(j));
@@ -47,10 +49,12 @@ public class OperGramatica {
                               break; 
                                       
                 }
-                aux2=Character.toString(grama.charAt(j));
+               
             
             }
+            
             i=j+1; //Lleva la i al proximo renglon de la gramatica
+           
         }
         
         return lista;
