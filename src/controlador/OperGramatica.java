@@ -49,7 +49,8 @@ public class OperGramatica {
                               break; 
                                       
                 }
-               
+                
+                aux2=Character.toString(grama.charAt(j));          //Actualiza el Dato a procesar
             
             }
             
