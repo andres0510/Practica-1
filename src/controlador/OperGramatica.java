@@ -62,5 +62,28 @@ public class OperGramatica {
         
     }
     
+    public static void recorrer(NodoLg p){
+        if(p!=null) {
+            
+            if(p.getLigaD()!=null){
+                System.out.println(p.getLigaD().getDato());
+                recorrer(p.getLigaD());
+                
+            }
+            
+            if(p.getLigaH()!=null){
+                if(!p.getDato().equals("*"))
+                    System.out.println(p.getDato());
+                recorrer(p.getLigaH());
+                
+            }
+            
+        
+        
+    }  
+        
+    
+    }
+    
     
 }

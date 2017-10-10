@@ -1,7 +1,9 @@
 package vista;
 
+import Lista.ListaP;
 import controlador.ControladorInterfaz;
 import controlador.LeerGuardar;
+import controlador.OperGramatica;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,6 +14,7 @@ public final class visual extends javax.swing.JFrame {
     LeerGuardar inOut = new LeerGuardar();
     ControladorInterfaz control = new ControladorInterfaz();
     boolean gramValid;
+    ListaP lista= new ListaP();
     
     public visual() {
         initComponents();
@@ -209,6 +212,8 @@ public final class visual extends javax.swing.JFrame {
             gramValid = inOut.validarGram(gramatica);
             if(gramValid){
                 jTextArea1.setText(gramatica);
+                lista=OperGramatica.graToLista(gramatica);
+                OperGramatica.recorrer(lista.getPrimer().getLigaD());
             } else{
                 JOptionPane.showMessageDialog(null, "La gramática ingresada no es válida");
             }

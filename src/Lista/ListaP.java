@@ -3,10 +3,28 @@ package Lista;
 public class ListaP {
     private final NodoLg raiz;
     private NodoLg posicion;
+    private NodoLg primer;
+    private NodoLg ultimo;
     
     public ListaP(){                                                                        //Constructor
         NodoLg x = new NodoLg("*");                                                         //Nodo cabeza de la lista
-        posicion=raiz=x;                                                                    //Ambos apuntadores dirigidos al nodo cabeza
+        posicion=raiz=primer=ultimo=x;                                                                    //Ambos apuntadores dirigidos al nodo cabeza
+    }
+
+    public NodoLg getPrimer() {
+        return primer;
+    }
+
+    public void setPrimer(NodoLg primer) {
+        this.primer = primer;
+    }
+
+    public NodoLg getUltimo() {
+        return ultimo;
+    }
+
+    public void setUltimo(NodoLg ultimo) {
+        this.ultimo = ultimo;
     }
 
     public void conectarNodo(String dato, char tipo, boolean fin){                          //Conecta un nuevo nodo hacia la derecha
@@ -36,6 +54,7 @@ public class ListaP {
         } else{                                                                             //El dato que se va a insertar a la lista hace parte de la derecha de la gramática
             if(posicion.getLigaD() == null){                                                //Si no hay datos insertados a la derecha
                 if(finDeLinea){                                                             //Si la línea termina ahí, entonces añade nodo cabeza para seguir escribiendo
+                    //
                     agregarNodoCabeza();
                     conectarNodo(dato, tipo, finDeLinea);
                 } else{                                                                     //Si aún no termina de escribir la línea entonces sigue añadiendo hacia la derecha
