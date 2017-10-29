@@ -15,6 +15,7 @@ public final class visual extends javax.swing.JFrame {
     ControladorInterfaz control = new ControladorInterfaz();
     boolean gramValid;
     ListaP lista= new ListaP();
+    OperGramatica op = new OperGramatica();
     
     public visual() {
         initComponents();
@@ -213,7 +214,9 @@ public final class visual extends javax.swing.JFrame {
             if(gramValid){
                 jTextArea1.setText(gramatica);
                 lista=OperGramatica.graToLista(gramatica);
-                OperGramatica.recorrer(lista.getPrimer().getLigaD());
+                OperGramatica.recorrer(lista.getPrimer());
+                boolean v = op.formaEspecial(lista);
+                System.out.println(v);
             } else{
                 JOptionPane.showMessageDialog(null, "La gramática ingresada no es válida");
             }
