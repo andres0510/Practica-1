@@ -6,7 +6,7 @@ public class NodoLg {
         Configuración del nodo con:
         1. Dato
         2. Tipo (T o NT)
-        3. Tres ligas (izquierda, derecha, hijo(
+        3. Tres ligas (izquierda, derecha, hijo)
         4. Fin de línea
     */
     

@@ -215,7 +215,7 @@ public final class visual extends javax.swing.JFrame {
                 jTextArea1.setText(gramatica);
                 lista=OperGramatica.graToLista(gramatica);
                 OperGramatica.recorrer(lista.getPrimer());
-                boolean v = op.formaEspecial(lista);
+                boolean v = op.formaEspecial(lista);                //¡IMPORTANTE! AQUÍ VA LA GRAMÁTICA SIMPLIFICADA
                 System.out.println(v);
             } else{
                 JOptionPane.showMessageDialog(null, "La gramática ingresada no es válida");
