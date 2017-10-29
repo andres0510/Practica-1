@@ -1,3 +1,7 @@
+
+
+
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -15,28 +19,39 @@ public class OperGramatica {
     
     
     public static ListaP graToLista(String grama){
-        int i=0,j,n =grama.length();
+        int i=1,j,n =grama.length();
         ListaP lista=new ListaP();
         NodoLg padre=new NodoLg("*");
-        String aux,aux2;
-        while(i<n){                                            //Recorre hasta la longitud total -1 para no tener en cuenta el ultimo salto de linea
-            aux=Character.toString(grama.charAt(i+1));             //Este while controla el lado izquierdo de la gramatica
+        String aux,aux2,aux3;
+        char token;
+        while(i<n){
+            aux="";
+            token=grama.charAt(i);
+            while(token!='>'){
+                aux=aux+Character.toString(grama.charAt(i));
+                i++;
+                token=grama.charAt(i);
+            }                                       
+                         
            
-            j=i+4;                                                // Contador que me llevara al lado derecho ce la gramatica
+            j=i+2;                                                // Contador que me llevara al lado derecho ce la gramatica
             aux2=Character.toString(grama.charAt(j));
             lista.insertarNodo(aux, 'n', false, padre);            //Inserta el lado izquierdo de la gramatica
             while(!"\n".equals(aux2)){
-                
+                aux3="";
                 switch(aux2){                                      //Este while controla el lado derecho de la gramatica
                     case "<": j++;
-                              aux2=Character.toString(grama.charAt(j));
-                              if(grama.charAt(j+2)=='\n')           //Si es un NT y es final de linea envia true
+                              token=grama.charAt(j);
+                              while(token!='>'){
+                                 aux3=aux3+Character.toString(grama.charAt(j));
+                                 j++;
+                                 token=grama.charAt(j);
+                                }                
+                              if(grama.charAt(j+1)=='\n')           //Si es un NT y es final de linea envia true
                                   lista.insertarNodo(aux2, 'n', true, null);
                               else
                                   lista.insertarNodo(aux2, 'n', false, null); //De lo contrario envia falso
                               j++;
-                              break;
-                    case ">": j++;
                               break;
                     case "/": lista.insertarNodo(aux, 't', true, null);  //Sera nuestro nulo en la gramatica
                               j++;
@@ -54,7 +69,7 @@ public class OperGramatica {
             
             }
             
-            i=j+1; //Lleva la i al proximo renglon de la gramatica
+            i=j+2; //Lleva la i al proximo renglon de la gramatica
            
         }
         
@@ -64,19 +79,16 @@ public class OperGramatica {
     
     public static void recorrer(NodoLg p){
         if(p!=null) {
-            
-            if(p.getLigaD()!=null){
-                System.out.println(p.getLigaD().getDato());
-                recorrer(p.getLigaD());
+            System.out.println(p.getDato());
+             if(p.getLigaH()!=null){
+                recorrer(p.getLigaH().getLigaD());
                 
             }
-            
-            if(p.getLigaH()!=null){
-                if(!p.getDato().equals("*"))
-                    System.out.println(p.getDato());
-                recorrer(p.getLigaH());
+            recorrer(p.getLigaD());
                 
-            }
+            
+            
+           
             
         
         
@@ -84,6 +96,9 @@ public class OperGramatica {
         
     
     }
+    
+    
+    
     
     
 }
