@@ -1,5 +1,7 @@
 package Lista;
 
+import java.util.ArrayList;
+
 public class ListaP {
     private final NodoLg raiz;
     private NodoLg posicion;
@@ -19,7 +21,15 @@ public class ListaP {
     public NodoLg getPrimer() {
         return primer;
     }
-
+    public boolean isEnd(NodoLg l){
+        return l==null;
+    }
+    
+    public boolean esVacia(ListaP lista){
+        NodoLg p=lista.getPrimer().getLigaD();
+        return p==null;
+    }
+    
     public void setPrimer(NodoLg primer) {
         this.primer = primer;
     }
@@ -99,6 +109,20 @@ public class ListaP {
         agregarNodoCabeza();
         posicion.setLigaD(posAux);
         posAux.setLigaI(posicion);
+    }
+    
+    public void desconectar(ListaP lista, ArrayList<String> conjunto){  //Metodo que desconecta los no terminales que dan paso a la simplificacion
+                                                                         //De la gramatica
+        NodoLg p=lista.getPrimer().getLigaD();
+        while(!lista.isEnd(p)){
+            if(conjunto.indexOf(p.getDato())!=-1){
+               p.getLigaI().setLigaD(p.getLigaD());
+               p.getLigaD().setLigaI(p.getLigaI());
+            }
+           p=p.getLigaD();
+            
+        
+        }
     }
    
 }

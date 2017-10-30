@@ -20,6 +20,7 @@ public class NodoLg {
     public NodoLg(String dato) {
         this.dato = dato;
         ligaD=ligaI=ligaH=null;
+        tipo=' ';
     }
 
     public String getDato() {

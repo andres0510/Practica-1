@@ -8,7 +8,7 @@ public class ControladorInterfaz {
         val.setEnabled(false);
         grdA.setEnabled(false);
         autD.setEnabled(false);
-        simp.setEnabled(false); 
+        simp.setEnabled(true); 
     }
     
     public void iniciarText(JTextField txt1, JTextArea txt2, JTextArea txt3){               //Configuracion por defecto de los cuadros de texto

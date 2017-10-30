@@ -2,10 +2,13 @@ package controlador;
 
 import Lista.ListaP;
 import Lista.NodoLg;
+import java.util.ArrayList;
 
 public class OperGramatica {
     private boolean formEsp=true;
-    
+    private static ArrayList<String> listaVivos=new ArrayList<String>();
+    private static ArrayList<String> listaAlcan=new ArrayList<String>();
+    private static String grama="";
     public static ListaP graToLista(String grama){                                  //Convertir la gramática String a lista generalizada
         int i=1;
         int largo=grama.length();
@@ -63,17 +66,19 @@ public class OperGramatica {
     public static void recorrer(NodoLg p){
         if(p!=null){
             System.out.println(p.getDato());
-            if(!p.getDato().equals("*")){
+           /* if(!p.getDato().equals("*")){
                 System.out.println(p.getTipo());
                 System.out.println(p.isFinDeLinea());
                 System.out.println("");
-            }
-            recorrer(p.getLigaD());
+            }*/
+            
             if(p.getLigaH()!=null){
                 recorrer(p.getLigaH());
             }
+            recorrer(p.getLigaD());
         }
     }
+    
     
     public boolean formaEspecial(ListaP lista){                                     //Ayuda a determinar si la gramática es de la forma especial y así poder hacer el autómata
         NodoLg pos = lista.getRaiz().getLigaD();
@@ -123,5 +128,229 @@ public class OperGramatica {
             recorreFila(pos.getLigaD(), tipo);
         }while(pos.getLigaH()!=null);
     }
+   /////////////////////////////////////////////////////////////////////////////// 
+   //Metodos para encontrar los no terminales vivos de la gramatica 
     
+    //Estos dos primeros metodos buscan cuales No terminales tienen solo cadenas de terminales a su derecha
+    public static void listaTermi(ListaP lista){
+        boolean b;
+        int j=0;
+        NodoLg primero=lista.getPrimer().getLigaD();        
+        while(!lista.isEnd(primero)){
+            b=busqueTerminales(primero.getLigaH(), primero, lista);
+            if(b){
+                listaVivos.add(j, primero.getDato());
+                j++;
+            }
+            primero=primero.getLigaD();
+        }
+              
+    }
+    
+   public static boolean busqueTerminales(NodoLg hijo, NodoLg padre, ListaP lista){
+       NodoLg l;
+       if(hijo!=null){
+           if((hijo.getDato().equals("*")) && (padre.getTipo()=='t') && (hijo.getLigaD()==null))
+               return true;
+           l=hijo.getLigaD();
+           while((!lista.isEnd(l)) && (l.getTipo()=='t')){
+               if(l.getLigaH()!=null){
+                  if(busqueTerminales(l.getLigaH(),l, lista))
+                      return true;              
+               }               
+               l=l.getLigaD();           
+           }
+           
+           if(lista.isEnd(l))
+               return true;
+           if(hijo.getLigaH()!=null)
+               return busqueTerminales(hijo.getLigaH(), padre, lista);   
+           
+       }
+       return false;
+   }
+   
+   //Estos ultimos dos me retornan la lista de los vivos
+    public static ArrayList<String> listaNomu(ListaP lista){
+        boolean b;
+        int j=0;
+                       
+        while(j<listaVivos.size()){
+            
+            NodoLg primero=lista.getPrimer().getLigaD();
+            while(!lista.isEnd(primero)){
+                if(listaVivos.indexOf(primero.getDato())!=-1)
+                    primero=primero.getLigaD();
+                else{
+                    b=busqueNoMu(primero.getLigaH(), lista, listaVivos);
+                    if(b)
+                        listaVivos.add(primero.getDato());
+                    primero=primero.getLigaD();
+                }
+            }
+            j++;        
+        }
+        return listaVivos;
+        
+    }
+    
+    public static boolean busqueNoMu(NodoLg hijo, ListaP lista, ArrayList<String> list){
+       NodoLg l;
+       int j=0;
+       if(hijo!=null){
+           l=hijo.getLigaD();
+           while((j==0) && !(lista.isEnd(l))){
+               if(l.getTipo()=='n')
+                   if(list.indexOf(l.getDato())==-1)
+                       j=1;
+               if(l.getLigaH()!=null)
+                  return busqueNoMu(l.getLigaH(), lista, list);     
+                              
+               l=l.getLigaD();           
+           }
+           
+           if(j==0)
+               return true;
+           if(hijo.getLigaH()!=null)
+               return busqueNoMu(hijo.getLigaH(), lista, list);   
+           
+       }
+       return false;
+   }
+  
+        //Metodo para encontrar los no vivos
+    
+    // Con este metodo hallo los muertos teniendo la lista de vivos 
+    public static ArrayList<String> listaMuertos(ListaP lista){
+        NodoLg primero=lista.getPrimer().getLigaD();
+        ArrayList<String> listaMuer=new ArrayList<String>();
+        while(!lista.isEnd(primero)){
+            if(listaVivos.indexOf(primero.getDato())==-1)
+                listaMuer.add(primero.getDato());
+            primero=primero.getLigaD();
+        }
+        return listaMuer;
+        
+    }
+    
+    public static int totalEstados(ListaP lista){
+        int i=0;
+        NodoLg p=lista.getPrimer().getLigaD();
+        while(!lista.isEnd(p)){
+            i++;
+            p=p.getLigaD();
+        }
+        return i;
+    }
+    
+    //Metodos para los que se pueden alcanzar
+    
+    public static ArrayList<String> listaAlcan(ListaP lista){
+        boolean b;
+        int j=0,estados=totalEstados(lista);
+        listaAlcan.add(lista.getPrimer().getLigaD().getDato());
+        while(j<listaAlcan.size()){
+            NodoLg primero=lista.getPrimer().getLigaD();
+            while(!lista.isEnd(primero)){
+                    if(listaAlcan.indexOf(primero.getDato())==-1)
+                        primero=primero.getLigaD();
+                    else{
+                    busqueAlcan(primero.getLigaH(), lista, listaAlcan);
+                    primero=primero.getLigaD();
+                    }
+                
+            }
+            if(listaAlcan.size()==estados)
+                j=listaAlcan.size();
+            else
+                j++;        
+        }
+        return listaAlcan;
+        
+    }
+    
+    public static void busqueAlcan(NodoLg hijo, ListaP lista, ArrayList<String> list){
+       NodoLg l;
+       if(hijo!=null){
+           l=hijo.getLigaD();
+           while(!lista.isEnd(l)){
+               if(l.getTipo()=='n')
+                   if(list.indexOf(l.getDato())==-1)
+                       list.add(l.getDato());
+               if(l.getLigaH()!=null)
+                       busqueAlcan(l.getLigaH(), lista, list);     
+                  l=l.getLigaD();           
+           }
+           if(hijo.getLigaH()!=null)
+               busqueAlcan(hijo.getLigaH(), lista, list);           
+           
+   }   
+       
+       
+    
+    }
+    
+    //Luego teniendo la lista de alcanzables se realiza el metodo para los inalcanzables
+    public static ArrayList<String> listaInalcanzables(ListaP lista){
+        NodoLg primero=lista.getPrimer().getLigaD();
+        ArrayList<String> listaInal=new ArrayList<String>();
+        while(!lista.isEnd(primero)){
+            if(listaAlcan.indexOf(primero.getDato())==-1)
+                listaInal.add(primero.getDato());
+            primero=primero.getLigaD();
+        }
+        return listaInal;
+        
+    }
+    
+    
+    //Los siguiente dos metodos me escriben la gramatica de lista a String
+    public static String toGrama(ListaP lista){
+        NodoLg primero=lista.getPrimer().getLigaD();
+            while(!lista.isEnd(primero)){
+                    grama=grama+"<"+primero.getDato()+">";
+                    agregar(primero.getLigaH(), lista, "<"+primero.getDato()+">", "");
+                    primero=primero.getLigaD();
+                }
+            
+                    
+        
+        return grama;
+        
+    }
+    public static void agregar(NodoLg hijo, ListaP lista, String padre, String bandera){
+        if(hijo!=null){
+            NodoLg l;
+            grama=grama+"=";
+            if(!bandera.equals(""))
+                grama=grama+bandera;
+            
+            l=hijo.getLigaD();
+            while(!lista.isEnd(l)){
+                if(l.getTipo()=='n')
+                    grama=grama+"<"+l.getDato()+">";
+                if(l.getTipo()=='t')
+                    grama=grama+l.getDato();
+                
+                l=l.getLigaD();
+            }
+            grama=grama+"\n";
+            l=hijo.getLigaD();
+            while(!lista.isEnd(l)){
+                if(l.getLigaH()!=null){
+                    grama=grama+padre;
+                    agregar(l.getLigaH(), lista, padre, l.getDato());
+                    
+                }
+                    
+                l=l.getLigaD();            
+            }
+            if(hijo.getLigaH()!=null){
+                grama=grama+padre;
+                agregar(hijo.getLigaH(), lista, padre, bandera);
+            }
+        }
+    
+    }
+   
 }

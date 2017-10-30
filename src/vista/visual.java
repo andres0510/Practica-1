@@ -5,6 +5,7 @@ import controlador.ControladorInterfaz;
 import controlador.LeerGuardar;
 import controlador.OperGramatica;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -13,14 +14,18 @@ public final class visual extends javax.swing.JFrame {
     
     LeerGuardar inOut = new LeerGuardar();
     ControladorInterfaz control = new ControladorInterfaz();
+    String gramaSimpli="";
     boolean gramValid;
     ListaP lista= new ListaP();
     OperGramatica op = new OperGramatica();
-    
+    ArrayList<String> listaVi=new ArrayList<String>();
+    ArrayList<String> listaMu=new ArrayList<String>();
+    ArrayList<String> listaAl=new ArrayList<String>();
+    ArrayList<String> listaIna=new ArrayList<String>();
     public visual() {
         initComponents();
         control.iniciarBotones(validar, guardarA, autDeterm, simplificar);
-        control.iniciarText(jTextField1, jTextArea2, jTextArea3);
+        control.iniciarText(jTextField1, textAreaG, textAreaVMI);
     }
         
     /**
@@ -37,9 +42,9 @@ public final class visual extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
+        textAreaG = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea3 = new javax.swing.JTextArea();
+        textAreaVMI = new javax.swing.JTextArea();
         jTextField1 = new javax.swing.JTextField();
         validar = new javax.swing.JButton();
         insertar = new javax.swing.JButton();
@@ -56,13 +61,13 @@ public final class visual extends javax.swing.JFrame {
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
 
-        jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
-        jScrollPane2.setViewportView(jTextArea2);
+        textAreaG.setColumns(20);
+        textAreaG.setRows(5);
+        jScrollPane2.setViewportView(textAreaG);
 
-        jTextArea3.setColumns(20);
-        jTextArea3.setRows(5);
-        jScrollPane3.setViewportView(jTextArea3);
+        textAreaVMI.setColumns(20);
+        textAreaVMI.setRows(5);
+        jScrollPane3.setViewportView(textAreaVMI);
 
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -104,6 +109,11 @@ public final class visual extends javax.swing.JFrame {
         });
 
         simplificar.setText("Simplificar Aut.");
+        simplificar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                simplificarActionPerformed(evt);
+            }
+        });
 
         salir.setText("Salir");
         salir.addActionListener(new java.awt.event.ActionListener() {
@@ -214,9 +224,10 @@ public final class visual extends javax.swing.JFrame {
             if(gramValid){
                 jTextArea1.setText(gramatica);
                 lista=OperGramatica.graToLista(gramatica);
-                OperGramatica.recorrer(lista.getPrimer());
-                boolean v = op.formaEspecial(lista);                //¡IMPORTANTE! AQUÍ VA LA GRAMÁTICA SIMPLIFICADA
-                System.out.println(v);
+                //OperGramatica.recorrer(lista.getPrimer().getLigaD());
+                
+                boolean v = op.formaEspecial(lista);                //¡IMPORTANTE! AQUÍ VA LA GRAMÁTICA SIMPLIFICADA......Mover esta funcion al boton generar automata!!!!
+                System.out.println(v);                      
             } else{
                 JOptionPane.showMessageDialog(null, "La gramática ingresada no es válida");
             }
@@ -224,6 +235,52 @@ public final class visual extends javax.swing.JFrame {
             Logger.getLogger(visual.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_insertarActionPerformed
+
+    private void simplificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_simplificarActionPerformed
+        if(!lista.esVacia(lista)){
+                OperGramatica.listaTermi(lista);
+                listaVi=OperGramatica.listaNomu(lista);
+                listaAl=OperGramatica.listaAlcan(lista);
+                listaMu=OperGramatica.listaMuertos(lista);
+                listaIna=OperGramatica.listaInalcanzables(lista);
+                String datos="";
+                if(!listaVi.isEmpty()){
+                datos="Estos son los no terminales Vivos\n";
+                for(int i=0;i<listaVi.size();i++){
+                    datos=datos+"<"+listaVi.get(i)+">"+"\n";                
+                }
+                
+                }
+                if(!listaMu.isEmpty()){
+                datos=datos+"Estos los no terminales muertos\n";
+                for(int i=0;i<listaMu.size();i++){
+                    datos=datos+"<"+listaMu.get(i)+">"+"\n";                
+                }
+                lista.desconectar(lista, listaMu);
+                }
+                
+                if(!listaIna.isEmpty()){
+                datos=datos+"Estos los no terminales Inalcanzables\n";
+                for(int i=0;i<listaIna.size();i++){
+                    datos=datos+"<"+listaIna.get(i)+">"+"\n";                
+                }
+                lista.desconectar(lista, listaIna);
+                }
+                textAreaVMI.setText(datos);
+                
+                if((listaVi.isEmpty())&&(listaAl.isEmpty())&&(listaMu.isEmpty())&&(listaIna.isEmpty()))
+                    JOptionPane.showMessageDialog(null,"No es posible simplificar la gramatica");
+                else{
+                    gramaSimpli=OperGramatica.toGrama(lista);
+                    textAreaG.setText(gramaSimpli);
+                }
+                    
+        
+        }
+        else
+            JOptionPane.showMessageDialog(null,"No se ha ingresado ninguna gramatica");
+        
+    }//GEN-LAST:event_simplificarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -270,11 +327,11 @@ public final class visual extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextArea jTextArea2;
-    private javax.swing.JTextArea jTextArea3;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JButton salir;
     private javax.swing.JButton simplificar;
+    private javax.swing.JTextArea textAreaG;
+    private javax.swing.JTextArea textAreaVMI;
     private javax.swing.JButton validar;
     // End of variables declaration//GEN-END:variables
 }
