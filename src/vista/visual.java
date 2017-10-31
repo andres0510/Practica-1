@@ -224,10 +224,14 @@ public final class visual extends javax.swing.JFrame {
             if(gramValid){
                 jTextArea1.setText(gramatica);
                 lista=OperGramatica.graToLista(gramatica);
-                //OperGramatica.recorrer(lista.getPrimer().getLigaD());
+                if(op.noTermDefinidos(lista.getRaiz().getLigaD(), lista)){
+                    //Operaciones
                 
+                
+                } else{
+                    JOptionPane.showMessageDialog(null, "Hay no terminales sin definir (sin producciones)");
+                }
                 boolean v = op.formaEspecial(lista);                //¡IMPORTANTE! AQUÍ VA LA GRAMÁTICA SIMPLIFICADA......Mover esta funcion al boton generar automata!!!!
-                System.out.println(v);                      
             } else{
                 JOptionPane.showMessageDialog(null, "La gramática ingresada no es válida");
             }
