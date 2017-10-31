@@ -202,7 +202,13 @@ public final class visual extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void validarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_validarActionPerformed
-
+        String hilera = jTextField1.getText();
+        boolean v=op.reconocerHilera(lista.getRaiz().getLigaD().getLigaH(), hilera, lista);
+        if(v){
+            JOptionPane.showMessageDialog(null, "Hilera válida");
+        } else{
+            JOptionPane.showMessageDialog(null, "La hilera no puede ser reconocida por la gramática");
+        }
     }//GEN-LAST:event_validarActionPerformed
 
     private void autDetermActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autDetermActionPerformed
@@ -223,7 +229,10 @@ public final class visual extends javax.swing.JFrame {
             gramValid = inOut.validarGram(gramatica);
             if(gramValid){
                 jTextArea1.setText(gramatica);
+                jTextField1.setEditable(true);
+                validar.setEnabled(true);
                 lista=OperGramatica.graToLista(gramatica);
+                //op.recorrer(lista.getRaiz());
                 if(op.noTermDefinidos(lista.getRaiz().getLigaD(), lista)){
                     //Operaciones
                 
