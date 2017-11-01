@@ -1,13 +1,22 @@
 package controlador;
 
+import java.awt.TextArea;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class LeerGuardar {
@@ -18,7 +27,8 @@ public class LeerGuardar {
     String texto="";        
     
     public String leerTxt() throws IOException{                             
-        fc = new JFileChooser();     
+        fc = new JFileChooser(); 
+        
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);                                                   //Buscar solo archivos de texto
         fc.addChoosableFileFilter(new FileNameExtensionFilter("Archivos Txt","txt"));
         fc.setAcceptAllFileFilterUsed(false);                                                       
@@ -161,5 +171,32 @@ public class LeerGuardar {
         }
         return true;
     }
+    
+    public void guardarTxt(JTextArea txtGcode) throws IOException{                             
+         try{
+       JFileChooser filechooser = new JFileChooser();
+       FileNameExtensionFilter filter = new FileNameExtensionFilter("Archivos de texto", "txt", "gcode");
+       filechooser.setFileFilter(filter);
+       filechooser.showSaveDialog(filechooser);
+       File guarda = filechooser.getSelectedFile();
+
+       if(guarda != null){
+      try ( 
+      /*guardamos el archivo y le damos el formato directamente*/ 
+          FileWriter save = new FileWriter(guarda+".txt")) {
+          PrintWriter pw = null;
+          pw = new PrintWriter(save);
+          pw.println(txtGcode.getText());
+
+          
+      }
+       }
+   }catch(IOException ex){
+   JOptionPane.showMessageDialog(null,"Su archivo no se ha guardado",
+   "Advertencia",JOptionPane.WARNING_MESSAGE);}
+         
+   }
+
+    
     
 }

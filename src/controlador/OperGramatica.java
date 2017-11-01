@@ -8,6 +8,9 @@ public class OperGramatica {
     private boolean formEsp=true;
     private static ArrayList<String> listaVivos=new ArrayList<String>();
     private static ArrayList<String> listaAlcan=new ArrayList<String>();
+    private static ArrayList<String> listaEntradas=new ArrayList<String>();
+   
+    private static String [][] matrizAuto;
     private static String grama="";
     public static ListaP graToLista(String grama){                                  //Convertir la gramática String a lista generalizada
         int i=1;
@@ -170,7 +173,7 @@ public class OperGramatica {
        return false;
    }
    
-   //Estos ultimos dos me retornan la lista de los vivos
+   //Estos ultimos dos me retornan la lista de los vivos y me va completando el conjunto con los mismo
     public static ArrayList<String> listaNomu(ListaP lista){
         boolean b;
         int j=0;
@@ -233,22 +236,15 @@ public class OperGramatica {
         
     }
     
-    public static int totalEstados(ListaP lista){
-        int i=0;
-        NodoLg p=lista.getPrimer().getLigaD();
-        while(!lista.isEnd(p)){
-            i++;
-            p=p.getLigaD();
-        }
-        return i;
-    }
+       
+    
     
     //Metodos para los que se pueden alcanzar
     
     public static ArrayList<String> listaAlcan(ListaP lista){
         boolean b;
-        int j=0,estados=totalEstados(lista);
-        listaAlcan.add(lista.getPrimer().getLigaD().getDato());
+        int j=0,estados=listaEsta(lista).size();
+        listaAlcan.add(lista.getPrimer().getLigaD().getDato()); //Agrega el primer no terminal de la gramatica dado que este es siempre alcanzable
         while(j<listaAlcan.size()){
             NodoLg primero=lista.getPrimer().getLigaD();
             while(!lista.isEnd(primero)){
@@ -271,7 +267,7 @@ public class OperGramatica {
     
     public static void busqueAlcan(NodoLg hijo, ListaP lista, ArrayList<String> list){
        NodoLg l;
-       if(hijo!=null){
+       if(hijo!=null){ 
            l=hijo.getLigaD();
            while(!lista.isEnd(l)){
                if(l.getTipo()=='n')
@@ -285,12 +281,8 @@ public class OperGramatica {
                busqueAlcan(hijo.getLigaH(), lista, list);           
            
    }   
-       
-       
-    
     }
-    
-    //Luego teniendo la lista de alcanzables se realiza el metodo para los inalcanzables
+     //Luego teniendo la lista de alcanzables se realiza el metodo para los inalcanzables
     public static ArrayList<String> listaInalcanzables(ListaP lista){
         NodoLg primero=lista.getPrimer().getLigaD();
         ArrayList<String> listaInal=new ArrayList<String>();
@@ -303,6 +295,117 @@ public class OperGramatica {
         
     }
     
+    
+  /////////////////////////////
+    
+    //Estos Metodos siguientes seran necesarios para la construccion del automata de la gramatica en forma especial ingresada
+       public static ArrayList<String> listaEntrad(ListaP lista){
+        NodoLg primero=lista.getPrimer().getLigaD();
+        while(!lista.isEnd(primero)){
+                    
+                    busqueEntra(primero.getLigaH(), listaEntradas);
+                    primero=primero.getLigaD();
+                          
+            } 
+        
+        return listaEntradas;
+        
+    }
+       
+   public static void busqueEntra(NodoLg hijo, ArrayList<String> list){
+       NodoLg l;
+       if(hijo!=null){ 
+           l=hijo.getLigaD();
+               if((l.getTipo()=='t')&&(!l.getDato().equals("/")))
+                   if(list.indexOf(l.getDato())==-1)
+                       list.add(l.getDato());
+                  
+           if(hijo.getLigaH()!=null)
+               busqueEntra(hijo.getLigaH(), list);           
+           
+   }   
+    }  
+   
+    public static ArrayList<String> listaEsta(ListaP lista){
+        ArrayList<String> listaaux=new ArrayList<String>();
+        NodoLg p=lista.getPrimer().getLigaD();
+        while(!lista.isEnd(p)){
+            listaaux.add(p.getDato());
+            p=p.getLigaD();
+        }
+        return listaaux;
+    }
+    
+    //Retorna la matriz que representa el automata
+    public static String [][] autoMatriz(ListaP lista){
+        ArrayList estados=listaEsta(lista);
+        ArrayList entradas=listaEntrad(lista);
+        int filas=estados.size()+1;
+        int columnas=entradas.size()+2;
+        NodoLg primer=lista.getPrimer().getLigaD();
+        NodoLg l = null;
+        matrizAuto=new String[filas][columnas];
+        int i=1,k;
+        while(i<estados.size()+1){
+            matrizAuto[i][0]=(String) estados.get(i-1);
+            i++;
+        }
+        i=1;
+        while(i<entradas.size()+1){
+            matrizAuto[0][i]=(String) estados.get(i-1);
+            i++;        
+        }
+        i=1;
+        while(!lista.isEnd(primer)){
+            k=0;
+            l=primer.getLigaH();
+            while((k<entradas.size())){
+                while((l!=null)){
+                        lleneMatriz(i,k+1,l,(String)entradas.get(k),'n',entradas.size());
+                        l=l.getLigaH();
+                    }
+               l=primer.getLigaH();
+               k++;
+            }
+            
+            primer=primer.getLigaD();
+            i++;
+        }
+                    
+       return matrizAuto;     
+            
+    }
+    
+    public static void lleneMatriz(int fila, int columna, NodoLg hijo, String entrada, char bandera, int aceptacion){
+    
+        if(hijo!=null){
+            
+            NodoLg l=hijo.getLigaD();
+            if(l.getDato().equals("/"))                
+                matrizAuto[fila][aceptacion+1]="1";
+            
+            
+            if((l.getDato().equals(entrada))&&(bandera=='n')){
+                matrizAuto[fila][columna]=l.getLigaD().getDato();
+                if(l.getLigaH()!=null)
+                    lleneMatriz(fila,columna,l.getLigaH(),entrada,'t',aceptacion);                             
+            }
+            if(bandera=='t'){
+                matrizAuto[fila][columna]=matrizAuto[fila][columna]+","+l.getDato();
+                if(l.getLigaH()!=null)
+                    lleneMatriz(fila,columna,l.getLigaH(),entrada,'t',aceptacion);
+                
+                
+            } 
+             
+            
+            }
+      
+    }
+    
+    
+    
+   
     
     //Los siguiente dos metodos me escriben la gramatica de lista a String
     public static String toGrama(ListaP lista){

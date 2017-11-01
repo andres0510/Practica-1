@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 public final class visual extends javax.swing.JFrame {
     
@@ -17,11 +18,13 @@ public final class visual extends javax.swing.JFrame {
     String gramaSimpli="";
     boolean gramValid;
     ListaP lista= new ListaP();
+    ListaP listaSimpli= new ListaP();
     OperGramatica op = new OperGramatica();
     ArrayList<String> listaVi=new ArrayList<String>();
     ArrayList<String> listaMu=new ArrayList<String>();
     ArrayList<String> listaAl=new ArrayList<String>();
     ArrayList<String> listaIna=new ArrayList<String>();
+    String [][] autoMatriz;
     public visual() {
         initComponents();
         control.iniciarBotones(validar, guardarA, autDeterm, simplificar);
@@ -54,6 +57,8 @@ public final class visual extends javax.swing.JFrame {
         autDeterm = new javax.swing.JButton();
         simplificar = new javax.swing.JButton();
         salir = new javax.swing.JButton();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tabla = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -122,6 +127,19 @@ public final class visual extends javax.swing.JFrame {
             }
         });
 
+        tabla.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane4.setViewportView(tabla);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -130,22 +148,6 @@ public final class visual extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(insertar, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(actualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(guardarG, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(guardarA, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(simplificar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(validar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(autDeterm, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(salir, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -153,7 +155,30 @@ public final class visual extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(insertar, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(actualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(guardarG, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(guardarA, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(validar)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(simplificar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(autDeterm, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -163,9 +188,11 @@ public final class visual extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(96, 96, 96)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 257, Short.MAX_VALUE))
                     .addComponent(jScrollPane1)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -210,7 +237,11 @@ public final class visual extends javax.swing.JFrame {
     }//GEN-LAST:event_autDetermActionPerformed
 
     private void guardarGActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarGActionPerformed
-        
+        try {
+            inOut.guardarTxt(jTextArea1);
+        } catch (IOException ex) {
+            Logger.getLogger(visual.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_guardarGActionPerformed
 
     private void salirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salirActionPerformed
@@ -225,19 +256,8 @@ public final class visual extends javax.swing.JFrame {
                 jTextArea1.setText(gramatica);
                 lista=OperGramatica.graToLista(gramatica);
                 //OperGramatica.recorrer(lista.getPrimer().getLigaD());
-                
-                boolean v = op.formaEspecial(lista);                //¡IMPORTANTE! AQUÍ VA LA GRAMÁTICA SIMPLIFICADA......Mover esta funcion al boton generar automata!!!!
-                System.out.println(v);                      
-            } else{
-                JOptionPane.showMessageDialog(null, "La gramática ingresada no es válida");
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(visual.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_insertarActionPerformed
-
-    private void simplificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_simplificarActionPerformed
-        if(!lista.esVacia(lista)){
+                if(!lista.esVacia(lista)){
+                listaSimpli=lista;
                 OperGramatica.listaTermi(lista);
                 listaVi=OperGramatica.listaNomu(lista);
                 listaAl=OperGramatica.listaAlcan(lista);
@@ -256,7 +276,7 @@ public final class visual extends javax.swing.JFrame {
                 for(int i=0;i<listaMu.size();i++){
                     datos=datos+"<"+listaMu.get(i)+">"+"\n";                
                 }
-                lista.desconectar(lista, listaMu);
+                lista.desconectar(listaSimpli, listaMu);
                 }
                 
                 if(!listaIna.isEmpty()){
@@ -264,14 +284,14 @@ public final class visual extends javax.swing.JFrame {
                 for(int i=0;i<listaIna.size();i++){
                     datos=datos+"<"+listaIna.get(i)+">"+"\n";                
                 }
-                lista.desconectar(lista, listaIna);
+                lista.desconectar(listaSimpli, listaIna);
                 }
                 textAreaVMI.setText(datos);
                 
-                if((listaVi.isEmpty())&&(listaAl.isEmpty())&&(listaMu.isEmpty())&&(listaIna.isEmpty()))
+                if((listaMu.isEmpty())&&(listaIna.isEmpty()))
                     JOptionPane.showMessageDialog(null,"No es posible simplificar la gramatica");
                 else{
-                    gramaSimpli=OperGramatica.toGrama(lista);
+                    gramaSimpli=OperGramatica.toGrama(listaSimpli);
                     textAreaG.setText(gramaSimpli);
                 }
                     
@@ -279,6 +299,25 @@ public final class visual extends javax.swing.JFrame {
         }
         else
             JOptionPane.showMessageDialog(null,"No se ha ingresado ninguna gramatica");
+                boolean v = op.formaEspecial(listaSimpli);                //¡IMPORTANTE! AQUÍ VA LA GRAMÁTICA SIMPLIFICADA......Mover esta funcion al boton generar automata!!!!
+                ArrayList<String> listaEntradas=OperGramatica.listaEntrad(lista);
+                ArrayList<String> listaEntrad=OperGramatica.listaEsta(lista);
+                autoMatriz=OperGramatica.autoMatriz(lista);
+                 //System.out.println(listaEntrad.size());
+               
+                
+                
+            } else{
+                JOptionPane.showMessageDialog(null, "La gramática ingresada no es válida");
+            }
+            
+        } catch (IOException ex) {
+            Logger.getLogger(visual.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_insertarActionPerformed
+
+    private void simplificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_simplificarActionPerformed
+        
         
     }//GEN-LAST:event_simplificarActionPerformed
 
@@ -326,10 +365,12 @@ public final class visual extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JButton salir;
     private javax.swing.JButton simplificar;
+    private javax.swing.JTable tabla;
     private javax.swing.JTextArea textAreaG;
     private javax.swing.JTextArea textAreaVMI;
     private javax.swing.JButton validar;
