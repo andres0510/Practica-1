@@ -5,6 +5,7 @@ import Lista.NodoLg;
 import java.util.ArrayList;
 
 public class OperGramatica {
+    
     private boolean formEsp=true;
     private static ArrayList<String> listaVivos=new ArrayList<String>();
     private static ArrayList<String> listaAlcan=new ArrayList<String>();
@@ -12,6 +13,10 @@ public class OperGramatica {
    
     private static String [][] matrizAuto;
     private static String grama="";
+    private int i=0;
+    private int j=0;
+    private String[][] mat = new String[i][j];
+    
     public static ListaP graToLista(String grama){                                  //Convertir la gramática String a lista generalizada
         int i=1;
         int largo=grama.length();
@@ -66,22 +71,45 @@ public class OperGramatica {
         return lista;
     }
     
-    public static void recorrer(NodoLg p){
+    public boolean noTermDefinidos(NodoLg p, ListaP lista){                         //Busca si todos los NT tienen por lo menos una producción
+        NodoLg main=lista.getRaiz();
+        boolean encontrado=false;
+        if(p!=null){
+            if(p.getTipo()=='n'){
+                while(main.getLigaD()!=null){
+                    main=main.getLigaD();
+                    if(main.getDato().equals(p.getDato())){
+                        encontrado = true;
+                    }
+                }
+            } else{
+                encontrado=true;
+            }
+            if(p.getLigaH()!=null && encontrado){
+                encontrado = noTermDefinidos(p.getLigaH(), lista);
+            }
+            if(encontrado){
+                encontrado = noTermDefinidos(p.getLigaD(), lista);
+            }
+            return encontrado;   
+        }
+        return true;
+    }
+    
+    public void recorrer(NodoLg p){
         if(p!=null){
             System.out.println(p.getDato());
-           /* if(!p.getDato().equals("*")){
+            /* if(!p.getDato().equals("*")){
                 System.out.println(p.getTipo());
                 System.out.println(p.isFinDeLinea());
                 System.out.println("");
             }*/
-            
             if(p.getLigaH()!=null){
                 recorrer(p.getLigaH());
             }
             recorrer(p.getLigaD());
         }
     }
-    
     
     public boolean formaEspecial(ListaP lista){                                     //Ayuda a determinar si la gramática es de la forma especial y así poder hacer el autómata
         NodoLg pos = lista.getRaiz().getLigaD();
@@ -131,6 +159,132 @@ public class OperGramatica {
             recorreFila(pos.getLigaD(), tipo);
         }while(pos.getLigaH()!=null);
     }
+    
+    public boolean tieneSalida(ListaP lista){                                       //Verifica si la gramática posee los λ que permitan dejar de procesar
+        int cantNT = listaEsta(lista).size();
+        boolean b;
+        boolean v[] = new boolean[cantNT];                                          //Vector para identificar si un NT posee una producción con λ
+        String t[] = new String[cantNT];                                            //Vector de NT para compararlos con su respectivo booleano
+        t = vectorNoTerminales(lista, t);
+        v = vectorBooleanos(lista, v);
+        b=tieneSecNula(v);
+        if(!b){                                                                     //Si no tiene secuencias nulas entonces no tiene cómo parar
+            return false;
+        }
+        b=buscaSalida(lista, v, t);
+        return b;
+    }
+    
+    private boolean buscaSalida(ListaP lista, boolean[] v, String nt[]) {           //Busca una salida para cada uno de los NT de la lista, buscando si van a otros NT que tienen salida
+        int i=0;
+        int j;
+        boolean cambios=false;                                                      //Detecta si el vector de booleanos ha sufrido cambios, para seguir operando en caso de que sí
+        NodoLg pos=lista.getRaiz();                                                 //Recorre la línea principal de la lista generalizada, los NT
+        NodoLg cabezas;                                                             //Recorre los nodos cabeza que pos pueda tener
+        NodoLg term;                                                                //Recorre los T de la lista
+        NodoLg cabT;                                                                //Recorre las posibles cabezas que puedan tener los T de la lista
+        NodoLg noTerm;                                                              //Recorre los NT no padres de la lista
+        while(i<v.length){                                                          //Mientras no sea el final de la lista
+            pos=pos.getLigaD();
+            if(v[i]==false){                                                        //Si el NT aún no tiene salida
+                cabezas=pos;
+                while(cabezas.getLigaH()!=null && v[i]==false){                     //Recorre las cabezas debajo de pos
+                    cabezas=cabezas.getLigaH();
+                    term=cabezas.getLigaD();
+                    noTerm=term.getLigaD();
+                    j=buscaPosicionNT(nt, noTerm.getDato());
+                    if(v[j]==true){                                                 //Si el terminal al que va tiene salida, entonces i tiene salida
+                        v[i]=true;
+                        cambios=true;
+                    }
+                    if(term.getLigaH()!=null && v[i]==false){                       //Si el terminal tiene hijos, los recorre de igual forma
+                        cabT=term;
+                        while(cabT.getLigaH()!=null && v[i]==false){
+                            cabT=cabT.getLigaH();
+                            noTerm=cabT.getLigaD();
+                            j=buscaPosicionNT(nt, noTerm.getDato());
+                            if(v[j]==true){
+                                v[i]=true;
+                                cambios=true;
+                            }
+                        }
+                    }
+                }
+            }
+            i++;
+        }
+        if(vectorVerdadero(v)){                                                     //Si todos los NT tienen salida devuelve true
+            return true;
+        }
+        if(cambios){                                                                //Si el vector sufrió cambios, entonces todavía se puede buscar salida
+            return buscaSalida(lista, v, nt);
+        }
+        return false;                                                               //Si no ha sufrido cambios y el vector aún no está lleno con 'true' entonces no tiene salida
+    }
+    
+    public String[] vectorNoTerminales(ListaP lista, String vector[]){              //Ayuda a pasar el los NT de la gramática a un vector
+        NodoLg pos = lista.getRaiz();
+        int i=0;
+        do{
+            pos=pos.getLigaD();
+            vector[i] = pos.getDato();
+            i++;
+        }while(pos.getLigaD()!=null);
+        return vector;
+    }
+    
+    public boolean[] vectorBooleanos(ListaP lista, boolean vector[]){               //Ayuda a llenar el vector de booleanos creado en tieneSalida()
+        NodoLg pos=lista.getRaiz();
+        NodoLg aux;
+        int i=0;
+        do{
+            pos=pos.getLigaD();
+            aux=pos;
+            do{
+                aux=aux.getLigaH();
+                if(aux.getLigaD().getDato().equals("/")){
+                    vector[i]=true;
+                }           
+            }while(aux.getLigaH()!=null);
+            i++;
+        }while(pos.getLigaD()!=null);
+        
+        return vector;
+    }
+    
+    public boolean tieneSecNula(boolean vec[]){                                     //Verifica si el vector de booleanos creado en tieneSalida(), tiene algún valor en true
+        int i=0;
+        while(i<vec.length){
+            if(vec[i]==true){
+                return true;
+            }
+            i++;
+        }
+        return false;
+    }
+    
+    public boolean vectorVerdadero(boolean vec[]){                                  //Verifica si el vector tiene todos sus elementos en true
+        int i=0;
+        while(i<vec.length){
+            if(vec[i]==false){
+                return false;
+            }
+            i++;
+        }
+        return true;
+    }
+    
+    public int buscaPosicionNT(String[] vec, String dato){                          //Busca el índice i del NT en el vector creado en buscaSalida()
+        int i=0;
+        do{
+            if(vec[i].equals(dato)){
+                return i;
+            }
+            i++;
+        }while(i<vec.length);
+        return -1;
+    }
+    
    /////////////////////////////////////////////////////////////////////////////// 
    //Metodos para encontrar los no terminales vivos de la gramatica 
     
@@ -266,6 +420,7 @@ public class OperGramatica {
     }
     
     public static void busqueAlcan(NodoLg hijo, ListaP lista, ArrayList<String> list){
+
        NodoLg l;
        if(hijo!=null){ 
            l=hijo.getLigaD();
@@ -281,20 +436,25 @@ public class OperGramatica {
                busqueAlcan(hijo.getLigaH(), lista, list);           
            
    }   
+
+       
+
     }
      //Luego teniendo la lista de alcanzables se realiza el metodo para los inalcanzables
     public static ArrayList<String> listaInalcanzables(ListaP lista){
         NodoLg primero=lista.getPrimer().getLigaD();
         ArrayList<String> listaInal=new ArrayList<String>();
         while(!lista.isEnd(primero)){
-            if(listaAlcan.indexOf(primero.getDato())==-1)
+            if(listaAlcan.indexOf(primero.getDato())==-1){
                 listaInal.add(primero.getDato());
+            }
             primero=primero.getLigaD();
         }
         return listaInal;
         
     }
     
+
     
   /////////////////////////////
     
@@ -407,34 +567,33 @@ public class OperGramatica {
     
    
     
+
     //Los siguiente dos metodos me escriben la gramatica de lista a String
     public static String toGrama(ListaP lista){
         NodoLg primero=lista.getPrimer().getLigaD();
-            while(!lista.isEnd(primero)){
-                    grama=grama+"<"+primero.getDato()+">";
-                    agregar(primero.getLigaH(), lista, "<"+primero.getDato()+">", "");
-                    primero=primero.getLigaD();
-                }
-            
-                    
-        
+        while(!lista.isEnd(primero)){
+            grama=grama+"<"+primero.getDato()+">";
+            agregar(primero.getLigaH(), lista, "<"+primero.getDato()+">", "");
+            primero=primero.getLigaD();
+        }
         return grama;
-        
     }
+    
     public static void agregar(NodoLg hijo, ListaP lista, String padre, String bandera){
         if(hijo!=null){
             NodoLg l;
             grama=grama+"=";
-            if(!bandera.equals(""))
+            if(!bandera.equals("")){
                 grama=grama+bandera;
-            
+            }
             l=hijo.getLigaD();
             while(!lista.isEnd(l)){
-                if(l.getTipo()=='n')
+                if(l.getTipo()=='n'){
                     grama=grama+"<"+l.getDato()+">";
-                if(l.getTipo()=='t')
+                }
+                if(l.getTipo()=='t'){
                     grama=grama+l.getDato();
-                
+                }
                 l=l.getLigaD();
             }
             grama=grama+"\n";
@@ -443,9 +602,7 @@ public class OperGramatica {
                 if(l.getLigaH()!=null){
                     grama=grama+padre;
                     agregar(l.getLigaH(), lista, padre, l.getDato());
-                    
                 }
-                    
                 l=l.getLigaD();            
             }
             if(hijo.getLigaH()!=null){
@@ -453,7 +610,75 @@ public class OperGramatica {
                 agregar(hijo.getLigaH(), lista, padre, bandera);
             }
         }
-    
     }
    
+    public NodoLg buscaNT(String nt, ListaP lista){
+        NodoLg p = lista.getRaiz();
+        while(p.getLigaD()!=null){
+            p=p.getLigaD();
+            if(p.getDato().equals(nt)){
+                return p;
+            }
+        }
+        return p;
+    }
+    
+    public boolean reconocerHilera(NodoLg p, String hilera, ListaP lista){  //p=primer NT
+        String caracter;
+        if(hilera.equals("")){
+            caracter="/";
+        } else{
+            caracter = Character.toString(hilera.charAt(0));
+        }
+        boolean valido=false;
+        String nt;
+        if(p!=null){
+            if(p.getTipo()=='n'){
+                nt=p.getDato();
+                valido = reconocerHilera(buscaNT(nt, lista).getLigaH(), hilera, lista);
+            }
+            if(p.getTipo()=='t'){
+                if(p.getDato().equals(caracter)){
+                    if(p.getLigaD()!=null){
+                        valido = reconocerHilera(p.getLigaD(), hilera.substring(1), lista);
+                    }
+                    if(!valido && p.getLigaH()!=null){
+                        valido = reconocerHilera(p.getLigaH(), hilera.substring(1), lista);
+                    }
+                    if(caracter.equals("/")){
+                        return true;
+                    }
+                    if(p.getLigaD()==null && hilera.length()==1){
+                        return true;
+                    }
+                }else{
+                    return false;
+                }
+            }
+            if(p.getTipo()==' '){
+                valido = reconocerHilera(p.getLigaD(), hilera, lista);
+                if(!valido && p.getLigaH()!=null){
+                    valido = reconocerHilera(p.getLigaH(), hilera, lista);
+                }
+            }
+            return valido;
+        }
+        return false;
+    }
+    
+    public boolean verifNoDet(){
+        int fila=1;
+        int columna=1;
+        while(fila<i-1){
+            while(columna<j){
+                if(mat[fila][columna].contains(",")){
+                    return true;
+                }
+                j++;
+            }
+            fila++;
+        }
+        return false;
+    }
+    
 }
