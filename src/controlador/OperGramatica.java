@@ -10,6 +10,9 @@ public class OperGramatica {
     private static ArrayList<String> listaVivos=new ArrayList<String>();
     private static ArrayList<String> listaAlcan=new ArrayList<String>();
     private static String grama="";
+    private int i=0;
+    private int j=0;
+    private String[][] mat = new String[i][j];
     
     public static ListaP graToLista(String grama){                                  //Convertir la gramática String a lista generalizada
         int i=1;
@@ -90,7 +93,7 @@ public class OperGramatica {
         return true;
     }
     
-    public static void recorrer(NodoLg p){
+    public void recorrer(NodoLg p){
         if(p!=null){
             System.out.println(p.getDato());
             /* if(!p.getDato().equals("*")){
@@ -499,9 +502,72 @@ public class OperGramatica {
         }
     }
    
-    public boolean reconocerHilera(ListaP lista, String hilera){
-        
+    public NodoLg buscaNT(String nt, ListaP lista){
+        NodoLg p = lista.getRaiz();
+        while(p.getLigaD()!=null){
+            p=p.getLigaD();
+            if(p.getDato().equals(nt)){
+                return p;
+            }
+        }
+        return p;
+    }
     
+    public boolean reconocerHilera(NodoLg p, String hilera, ListaP lista){  //p=primer NT
+        String caracter;
+        if(hilera.equals("")){
+            caracter="/";
+        } else{
+            caracter = Character.toString(hilera.charAt(0));
+        }
+        boolean valido=false;
+        String nt;
+        if(p!=null){
+            if(p.getTipo()=='n'){
+                nt=p.getDato();
+                valido = reconocerHilera(buscaNT(nt, lista).getLigaH(), hilera, lista);
+            }
+            if(p.getTipo()=='t'){
+                if(p.getDato().equals(caracter)){
+                    if(p.getLigaD()!=null){
+                        valido = reconocerHilera(p.getLigaD(), hilera.substring(1), lista);
+                    }
+                    if(!valido && p.getLigaH()!=null){
+                        valido = reconocerHilera(p.getLigaH(), hilera.substring(1), lista);
+                    }
+                    if(caracter.equals("/")){
+                        return true;
+                    }
+                    if(p.getLigaD()==null && hilera.length()==1){
+                        return true;
+                    }
+                }else{
+                    return false;
+                }
+            }
+            if(p.getTipo()==' '){
+                valido = reconocerHilera(p.getLigaD(), hilera, lista);
+                if(!valido && p.getLigaH()!=null){
+                    valido = reconocerHilera(p.getLigaH(), hilera, lista);
+                }
+            }
+            return valido;
+        }
+        return false;
+    }
+    
+    public boolean verifNoDet(){
+        int fila=1;
+        int columna=1;
+        while(fila<i-1){
+            while(columna<j){
+                if(mat[fila][columna].contains(",")){
+                    return true;
+                }
+                j++;
+            }
+            fila++;
+        }
         return false;
     }
     

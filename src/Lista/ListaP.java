@@ -120,8 +120,6 @@ public class ListaP {
                p.getLigaD().setLigaI(p.getLigaI());
             }
            p=p.getLigaD();
-            
-        
         }
     }
    
